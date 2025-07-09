@@ -1,0 +1,21 @@
+[Unit]
+Description=Paperpile to Notion Sync Service
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/paperpile-to-notion
+ExecStart=/usr/bin/python3 /home/YOUR_USERNAME/paperpile-to-notion/main.py
+Restart=always
+RestartSec=30
+
+# Environment
+Environment="PYTHONUNBUFFERED=1"
+
+# Logging
+StandardOutput=append:/home/YOUR_USERNAME/paperpile-to-notion/logs/stdout.log
+StandardError=append:/home/YOUR_USERNAME/paperpile-to-notion/logs/stderr.log
+
+[Install]
+WantedBy=multi-user.target
