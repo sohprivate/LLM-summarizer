@@ -2,6 +2,31 @@
 
 学術論文管理ツールPaperpileとNotionを自動連携し、Google Driveに保存されたPDFからGemini APIを使用して論文の要約を生成し、Notionデータベースに自動的に整理するツールです。
 
+## 📚 Paperpileとは
+
+Paperpileは研究者向けの論文管理ツールで、以下の特徴があります：
+
+- **論文の自動取り込み**: ブラウザ拡張機能でワンクリックで論文を保存
+- **Google Drive統合**: すべての論文PDFをGoogle Driveに自動保存
+- **引用管理**: Google DocsやMicrosoft Wordでの引用挿入
+- **タグ・フォルダ管理**: 論文を効率的に整理
+
+### Paperpileのワークフロー
+
+1. **論文の追加**: 
+   - 学術データベース（PubMed、Google Scholar等）から直接インポート
+   - PDFをドラッグ&ドロップ
+   - DOIやPubMed IDから自動取得
+
+2. **Google Drive同期**:
+   - Paperpileは論文PDFを指定したGoogle Driveフォルダに自動保存
+   - フォルダ構造: `/Paperpile/[著者名] [年] - [タイトル].pdf`
+
+3. **本ツールの役割**:
+   - PaperpileがGoogle Driveに保存したPDFを監視
+   - 新しい論文を検出して自動的に処理
+   - Notionで研究ノートや要約を管理
+
 ## 🌟 主な機能
 
 ### 自動論文処理
@@ -93,12 +118,31 @@
    - データベースのURLから取得
    - 例: `https://www.notion.so/xxxxx?v=yyyyy`の`xxxxx`部分
 
-### 4. Google Driveフォルダの準備
+### 4. Paperpile設定
 
-1. Google Driveで論文保存用フォルダを作成
+#### 4.1 Paperpileアカウントの作成
+1. [Paperpile](https://paperpile.com/)にアクセス
+2. Googleアカウントでサインアップ
+3. 30日間の無料トライアル開始（その後は月額$2.99）
+
+#### 4.2 Google Drive同期の設定
+1. Paperpileの設定画面を開く
+2. 「Google Drive Sync」を有効化
+3. Googleアカウントと連携
+4. 同期フォルダが自動作成される（通常は`/Paperpile`）
+
+#### 4.3 ブラウザ拡張機能のインストール
+1. [Chrome拡張機能](https://chrome.google.com/webstore/detail/paperpile/bomfdkbfpdhijjbeoicnfhjbdhncfhig)または[Firefox拡張機能](https://addons.mozilla.org/en-US/firefox/addon/paperpile/)をインストール
+2. 拡張機能にログイン
+
+### 5. Google Driveフォルダの確認
+
+1. Google DriveでPaperpileフォルダを確認
+   - 通常は`/Paperpile`に作成される
 2. フォルダIDを取得:
    - フォルダを開いてURLを確認
    - `https://drive.google.com/drive/folders/FOLDER_ID`の`FOLDER_ID`部分
+3. このIDを`.env`ファイルの`GOOGLE_DRIVE_FOLDER_ID`に設定
 
 ## 🚀 セットアップ
 
@@ -155,22 +199,45 @@ python main.py --setup-notion
 
 ## 📖 使い方
 
+### 基本的な使用フロー
+
+1. **Paperpileで論文を追加**:
+   - ブラウザ拡張機能で論文ページから直接追加
+   - PDFをPaperpileにドラッグ&ドロップ
+   - DOI/PubMed IDで検索して追加
+
+2. **自動同期を待つ**:
+   - PaperpileがGoogle Driveに自動でPDFを保存
+   - 通常は数秒〜1分程度
+
+3. **本ツールが自動処理**:
+   - 新しいPDFを検出
+   - Gemini APIで論文を分析
+   - Notionに日本語要約付きで登録
+
 ### 継続的な監視モード（推奨）
 ```bash
 python main.py
 ```
 - 5分ごと（デフォルト）に新しいPDFをチェック
 - Ctrl+Cで停止
+- バックグラウンド実行推奨
 
 ### 1回だけ実行
 ```bash
 python main.py --once
 ```
+- 現在の新しいファイルのみ処理
+- cronやタスクスケジューラーでの定期実行に適用
 
 ### ログの確認
 ```bash
 tail -f logs/paperpile-to-notion.log
 ```
+
+### 処理状況の確認
+- `processed_files.txt`: 処理済みファイルのリスト
+- Notionデータベース: 追加された論文を確認
 
 ## 🔧 トラブルシューティング
 
@@ -210,6 +277,19 @@ LLM-summarizer/
 └── .env.example        # 環境変数テンプレート
 ```
 
+## 💡 活用例
+
+### 研究者の使用例
+- **文献レビュー**: 大量の論文を効率的に整理・要約
+- **研究ノート**: Notionで論文ごとにメモや考察を追加
+- **共同研究**: チームでNotionデータベースを共有
+- **進捗管理**: 読んだ論文の管理と引用準備
+
+### カスタマイズ例
+- 要約の詳細度を調整（プロンプト編集）
+- 特定の研究分野に特化した分析
+- 追加のメタデータ抽出（実験手法、データセット等）
+
 ## 🤝 貢献
 
 Issue報告やPull Requestを歓迎します。
@@ -221,6 +301,7 @@ MIT License
 ## 🙏 謝辞
 
 このプロジェクトは以下のサービスを使用しています:
+- [Paperpile](https://paperpile.com/) - 優れた論文管理ツール
 - Google Drive API
 - Google Gemini API
 - Notion API
