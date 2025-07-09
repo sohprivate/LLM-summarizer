@@ -1,7 +1,7 @@
 """Google Drive file monitoring module."""
 import os
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Optional
 from loguru import logger
 from dotenv import load_dotenv
@@ -19,7 +19,7 @@ class DriveMonitor:
         if not self.folder_id:
             raise ValueError("GOOGLE_DRIVE_FOLDER_ID not set in environment variables")
         
-        self.last_check = datetime.now() - timedelta(days=1)  # Start checking from 1 day ago
+        self.last_check = datetime.now(timezone.utc) - timedelta(days=1)  # Start checking from 1 day ago
         self.processed_files = set()
         self._load_processed_files()
     
@@ -64,7 +64,7 @@ class DriveMonitor:
                     logger.info(f"Found new PDF: {item['name']}")
             
             # Update last check time
-            self.last_check = datetime.now()
+            self.last_check = datetime.now(timezone.utc)
             
             return new_files
         

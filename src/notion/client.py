@@ -62,7 +62,7 @@ class NotionPaperDatabase:
                     }
                 ]
             },
-            "Journal": {
+            "Journal ": {
                 "rich_text": [
                     {
                         "text": {
@@ -81,16 +81,16 @@ class NotionPaperDatabase:
             },
             "Research Field": {
                 "select": {
-                    "name": paper_data.get("research_field", "General")[:100]
+                    "name": paper_data.get("research_field", "General").split(",")[0].strip()[:100]
                 }
             },
-            "Keywords": {
+            "Keywords ": {
                 "multi_select": [
                     {"name": keyword[:100]} 
                     for keyword in paper_data.get("keywords", [])[:10]
                 ]
             },
-            "Summary": {
+            "Summary ": {
                 "rich_text": [
                     {
                         "text": {
@@ -123,7 +123,7 @@ class NotionPaperDatabase:
                     "object": "block",
                     "type": "heading_2",
                     "heading_2": {
-                        "rich_text": [{"type": "text", "text": {"content": "Abstract"}}]
+                        "rich_text": [{"type": "text", "text": {"content": "概要"}}]
                     }
                 },
                 {
@@ -147,7 +147,7 @@ class NotionPaperDatabase:
                     "object": "block",
                     "type": "heading_2",
                     "heading_2": {
-                        "rich_text": [{"type": "text", "text": {"content": "Methodology"}}]
+                        "rich_text": [{"type": "text", "text": {"content": "研究手法"}}]
                     }
                 },
                 {
@@ -164,13 +164,61 @@ class NotionPaperDatabase:
                 }
             ])
         
+        # Limitations section
+        if paper_data.get("limitations"):
+            blocks.extend([
+                {
+                    "object": "block",
+                    "type": "heading_2",
+                    "heading_2": {
+                        "rich_text": [{"type": "text", "text": {"content": "研究の限界"}}]
+                    }
+                },
+                {
+                    "object": "block",
+                    "type": "paragraph",
+                    "paragraph": {
+                        "rich_text": [
+                            {
+                                "type": "text",
+                                "text": {"content": paper_data["limitations"][:2000]}
+                            }
+                        ]
+                    }
+                }
+            ])
+        
+        # Practical implications section
+        if paper_data.get("practical_implications"):
+            blocks.extend([
+                {
+                    "object": "block",
+                    "type": "heading_2",
+                    "heading_2": {
+                        "rich_text": [{"type": "text", "text": {"content": "実践的意義"}}]
+                    }
+                },
+                {
+                    "object": "block",
+                    "type": "paragraph",
+                    "paragraph": {
+                        "rich_text": [
+                            {
+                                "type": "text",
+                                "text": {"content": paper_data["practical_implications"][:2000]}
+                            }
+                        ]
+                    }
+                }
+            ])
+        
         # Key findings section
         if paper_data.get("key_findings"):
             blocks.append({
                 "object": "block",
                 "type": "heading_2",
                 "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "Key Findings"}}]
+                    "rich_text": [{"type": "text", "text": {"content": "主要な発見"}}]
                 }
             })
             
@@ -195,7 +243,7 @@ class NotionPaperDatabase:
                     "object": "block",
                     "type": "heading_2",
                     "heading_2": {
-                        "rich_text": [{"type": "text", "text": {"content": "Links"}}]
+                        "rich_text": [{"type": "text", "text": {"content": "リンク"}}]
                     }
                 },
                 {
@@ -206,7 +254,7 @@ class NotionPaperDatabase:
                             {
                                 "type": "text",
                                 "text": {
-                                    "content": "View in Google Drive",
+                                    "content": "Google Driveで表示",
                                     "link": {
                                         "url": f"https://drive.google.com/file/d/{paper_data['drive_file_id']}/view"
                                     }

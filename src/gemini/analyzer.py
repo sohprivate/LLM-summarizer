@@ -35,11 +35,15 @@ class PaperAnalyzer:
         prompt = self._create_analysis_prompt(text)
         
         try:
+            # Log the prompt for debugging
+            logger.debug(f"Sending prompt to Gemini: {prompt[:500]}...")
+            
             # Generate response
             response = self.model.generate_content(prompt)
             
             # Parse JSON response
             result_text = response.text.strip()
+            logger.debug(f"Gemini response: {result_text[:500]}...")
             # Remove markdown code blocks if present
             if result_text.startswith("```json"):
                 result_text = result_text[7:]
@@ -49,10 +53,15 @@ class PaperAnalyzer:
             metadata = json.loads(result_text.strip())
             
             # Validate required fields
-            required_fields = ['title', 'authors', 'journal', 'year', 'abstract']
+            required_fields = ['title', 'authors', 'journal', 'year', 'abstract', 'summary', 'methodology', 'key_findings', 'research_field', 'limitations', 'practical_implications']
             for field in required_fields:
                 if field not in metadata:
-                    metadata[field] = 'Not found'
+                    if field in ['authors', 'keywords', 'key_findings']:
+                        metadata[field] = []
+                    elif field == 'year':
+                        metadata[field] = 0
+                    else:
+                        metadata[field] = '不明'
             
             logger.info(f"Successfully analyzed paper: {metadata.get('title', 'Unknown')}")
             return metadata
@@ -68,25 +77,29 @@ class PaperAnalyzer:
     def _create_analysis_prompt(self, text: str) -> str:
         """Create prompt for paper analysis."""
         return f"""
-You are an expert at analyzing academic papers. Please analyze the following paper text and extract key metadata.
+あなたは学術論文の分析に精通した専門家です。以下の論文テキストを分析し、重要なメタデータを抽出してください。
 
-Return ONLY a JSON object with the following structure (no additional text or explanation):
+以下の構造のJSONオブジェクトのみを返してください（追加のテキストや説明は不要です）：
 {{
-    "title": "Full title of the paper",
-    "authors": ["Author 1", "Author 2", ...],
-    "journal": "Journal or conference name",
+    "title": "論文の完全なタイトル",
+    "authors": ["著者1", "著者2", ...],
+    "journal": "ジャーナルまたは会議名",
     "year": 2024,
-    "abstract": "The paper's abstract",
-    "keywords": ["keyword1", "keyword2", ...],
-    "summary": "A 2-3 sentence summary of the paper's main contribution",
-    "methodology": "Brief description of the methodology used",
-    "key_findings": ["Finding 1", "Finding 2", ...],
-    "research_field": "Primary research field/discipline"
+    "abstract": "論文の要約（アブストラクト）を日本語で記述",
+    "keywords": ["日本語のキーワード1", "日本語のキーワード2", ...],
+    "summary": "論文の主要な貢献について、研究の背景・目的、使用した手法、主要な発見や結果、研究の意義や影響を含めて5-8文程度で日本語で詳細に要約してください",
+    "methodology": "使用された研究手法の詳細な説明（実験設計、データ収集方法、分析手法など）を日本語で記述",
+    "key_findings": ["重要な発見1（具体的な数値や結果を含む）を日本語で", "重要な発見2を日本語で", ...],
+    "research_field": "主要な研究分野/学問領域を日本語で",
+    "limitations": "研究の限界や今後の課題を日本語で記述",
+    "practical_implications": "実践的な意味や応用可能性を日本語で記述"
 }}
 
-If any field cannot be found, use "Not found" for strings, [] for arrays, and 0 for numbers.
+フィールドが見つからない場合は、文字列には「不明」、配列には[]、数値には0を使用してください。
+summaryは必ず詳細に記述し、論文の核心を捉えてください。
+すべてのフィールドの値は日本語で記述してください。
 
-Paper text:
+論文テキスト:
 {text[:10000]}  # Limit to avoid token limits
 """
     
@@ -97,12 +110,16 @@ Paper text:
             return None
         
         prompt = f"""
-Provide a concise 3-4 sentence summary of this academic paper, focusing on:
-1. What problem it addresses
-2. The main approach/method
-3. Key findings or contributions
+この学術論文について、以下の点を含めて詳細な要約を日本語で提供してください（8-10文程度）：
 
-Paper text:
+1. 研究の背景と問題意識
+2. 研究目的と研究課題
+3. 使用された主要な手法・アプローチ
+4. 重要な発見や結果（具体的な数値があれば含める）
+5. 研究の意義と貢献
+6. 実践的な応用可能性
+
+論文テキスト:
 {text[:5000]}
 """
         

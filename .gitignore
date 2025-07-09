@@ -38,6 +38,7 @@ wheels/
 # Credentials
 credentials.json
 token.json
+token.pickle
 *.key
 *.pem
 
@@ -53,3 +54,6 @@ Thumbs.db
 downloads/
 output/
 temp/
+processed_files.txt
+processed_files_backup.txt
+*.pdf
