@@ -53,12 +53,15 @@ class PaperAnalyzer:
             metadata = json.loads(result_text.strip())
             
             # Validate required fields
-            required_fields = ['title', 'authors', 'journal', 'year', 'abstract', 'summary', 'methodology', 'key_findings', 'research_field', 'limitations', 'practical_implications']
+            required_fields = ['title', 'authors', 'journal', 'year', 'impact_factor', 'background', 
+                             'target_population', 'study_design', 'methods', 'statistical_methods', 
+                             'results', 'discussion', 'limitations', 'conclusion', 'strengths', 
+                             'abstract', 'keywords', 'research_field']
             for field in required_fields:
                 if field not in metadata:
-                    if field in ['authors', 'keywords', 'key_findings']:
+                    if field in ['authors', 'keywords']:
                         metadata[field] = []
-                    elif field == 'year':
+                    elif field in ['year', 'impact_factor']:
                         metadata[field] = 0
                     else:
                         metadata[field] = '不明'
@@ -85,18 +88,24 @@ class PaperAnalyzer:
     "authors": ["著者1", "著者2", ...],
     "journal": "ジャーナルまたは会議名",
     "year": 2024,
-    "abstract": "論文の要約（アブストラクト）を日本語で記述",
+    "impact_factor": 0.0,
+    "background": "研究の背景と動機を日本語で詳細に記述（なぜこの研究が必要か、既存研究の問題点など）",
+    "target_population": "研究の対象集団を日本語で記述（サンプルサイズ、選択基準、人口統計学的特徴など）",
+    "study_design": "研究デザインを日本語で記述（前向き/後ろ向き、観察研究/介入研究、ランダム化比較試験など）",
+    "methods": "研究方法を日本語で詳細に記述（データ収集方法、測定手法、実験手順など）",
+    "statistical_methods": "使用した統計手法を日本語で記述（検定方法、有意水準、多重比較補正など）",
+    "results": "主要な結果を日本語で詳細に記述（具体的な数値、統計的有意性、効果量など）",
+    "discussion": "考察を日本語で記述（結果の解釈、既存研究との比較、臨床的意義など）",
+    "limitations": "研究の限界を日本語で記述（サンプルサイズ、バイアス、一般化可能性など）",
+    "conclusion": "結論を日本語で簡潔に記述（主要な発見と今後の展望）",
+    "strengths": "研究の強みを日本語で記述（新規性、方法論的優位性、実用性など）",
+    "abstract": "論文のアブストラクト全文を日本語で",
     "keywords": ["日本語のキーワード1", "日本語のキーワード2", ...],
-    "summary": "論文の主要な貢献について、研究の背景・目的、使用した手法、主要な発見や結果、研究の意義や影響を含めて5-8文程度で日本語で詳細に要約してください",
-    "methodology": "使用された研究手法の詳細な説明（実験設計、データ収集方法、分析手法など）を日本語で記述",
-    "key_findings": ["重要な発見1（具体的な数値や結果を含む）を日本語で", "重要な発見2を日本語で", ...],
-    "research_field": "主要な研究分野/学問領域を日本語で",
-    "limitations": "研究の限界や今後の課題を日本語で記述",
-    "practical_implications": "実践的な意味や応用可能性を日本語で記述"
+    "research_field": "主要な研究分野/学問領域を日本語で"
 }}
 
 フィールドが見つからない場合は、文字列には「不明」、配列には[]、数値には0を使用してください。
-summaryは必ず詳細に記述し、論文の核心を捉えてください。
+impact_factorが論文中に記載されていない場合は0としてください。
 すべてのフィールドの値は日本語で記述してください。
 
 論文テキスト:

@@ -44,7 +44,7 @@ class NotionPaperDatabase:
     def _prepare_properties(self, paper_data: Dict) -> Dict:
         """Prepare properties for Notion page."""
         properties = {
-            "Title": {
+            "タイトル": {
                 "title": [
                     {
                         "text": {
@@ -53,7 +53,7 @@ class NotionPaperDatabase:
                     }
                 ]
             },
-            "Authors": {
+            "筆者": {
                 "rich_text": [
                     {
                         "text": {
@@ -62,7 +62,7 @@ class NotionPaperDatabase:
                     }
                 ]
             },
-            "Journal ": {
+            "雑誌": {
                 "rich_text": [
                     {
                         "text": {
@@ -71,39 +71,98 @@ class NotionPaperDatabase:
                     }
                 ]
             },
-            "Year": {
+            "出版年": {
                 "number": paper_data.get("year", 0)
             },
-            "Added Date": {
-                "date": {
-                    "start": datetime.now().isoformat()
-                }
+            "IF(impact factor)": {
+                "number": paper_data.get("impact_factor", 0)
             },
-            "Research Field": {
-                "select": {
-                    "name": paper_data.get("research_field", "General").split(",")[0].strip()[:100]
-                }
-            },
-            "Keywords ": {
-                "multi_select": [
-                    {"name": keyword[:100]} 
-                    for keyword in paper_data.get("keywords", [])[:10]
-                ]
-            },
-            "Summary ": {
+            "背景": {
                 "rich_text": [
                     {
                         "text": {
-                            "content": paper_data.get("summary", "")[:2000]
+                            "content": paper_data.get("background", "")[:2000]
                         }
                     }
                 ]
             },
-            "Google Drive ID": {
+            "対象集団": {
                 "rich_text": [
                     {
                         "text": {
-                            "content": paper_data.get("drive_file_id", "")
+                            "content": paper_data.get("target_population", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "研究デザイン": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("study_design", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "方法": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("methods", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "統計手法": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("statistical_methods", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "結果": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("results", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "考察": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("discussion", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "限界": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("limitations", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "結論": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("conclusion", "")[:2000]
+                        }
+                    }
+                ]
+            },
+            "強み": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": paper_data.get("strengths", "")[:2000]
                         }
                     }
                 ]
@@ -273,7 +332,7 @@ class NotionPaperDatabase:
             response = self.client.databases.query(
                 database_id=self.database_id,
                 filter={
-                    "property": "Title",
+                    "property": "タイトル",
                     "title": {
                         "equals": title
                     }
